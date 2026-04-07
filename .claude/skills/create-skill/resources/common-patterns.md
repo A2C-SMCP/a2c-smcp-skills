@@ -18,6 +18,7 @@
 ---
 name: kebab-case-name        # 小写+连字符，≤64 字符
 description: 功能描述 + 触发场景。≤1024 字符
+argument-hint: SKILL可以接收的参数说明
 ---
 ```
 

@@ -1,6 +1,7 @@
 ---
 name: create-skill
 description: 为 A2C-SMCP 项目线创建跨项目共享的 Claude Code Skill。收集各项目现有 Skill 并分析共性与差异，生成统一 SKILL.md 和按项目拆分的 resources 文件。当需要新建适用于多个 A2C-SMCP 项目的 Skill 时调用。
+argument-hint: "<skill-name>"
 ---
 
 # Create Skill（跨项目统一版）

@@ -28,10 +28,20 @@ A2C-SMCP 开源项目的 Claude Code Plugin Marketplace。用户通过 `claude p
 
 `.claude/skills/` 下的 Skill（如 `create-skill`）是本项目的**开发工具**，不注册到 marketplace。`skills/` 目录下的 Skill 通过 `a2c-smcp-toolkit` 插件自动发现并分发，无需手动注册。
 
+## SKILL.md Frontmatter 规范
+
+```yaml
+---
+name: kebab-case-name        # 小写+连字符，≤64 字符
+description: 功能描述 + 触发场景。≤1024 字符
+argument-hint: "<参数提示>"   # 可选，提示用户输入参数，如 "<skill-name>"、"[issue-number]"
+---
+```
+
 ## Adding a Skill
 
 1. 在 `skills/<skill-name>/` 下创建目录
-2. 添加 `skills/<skill-name>/SKILL.md`（含 YAML frontmatter）
+2. 添加 `skills/<skill-name>/SKILL.md`（含上述 YAML frontmatter）
 3. 可选：添加 `skills/<skill-name>/resources/` 存放项目差异化资源
 4. 提交推送到 main 分支，用户通过 `/plugin update` 获取更新
 
@@ -64,4 +74,19 @@ A2C-SMCP 开源项目的 Claude Code Plugin Marketplace。用户通过 `claude p
 
 ## Prerequisite Check
 
-在开发任何 SKILL 之前，必须预检使用者是否已通过 permissions 授权了上述所有仓库目录。如有缺失则拒绝执行，并要求用户补全权限。
+在开发任何 SKILL 之前，必须预检使用者是否已通过 `/add-dir` 授权了上述所有仓库的本地目录。如有缺失则拒绝执行，并提示用户逐个添加。
+
+需要添加的仓库目录（路径因用户环境而异，以下为示例）：
+
+```
+/add-dir <path-to>/python-sdk
+/add-dir <path-to>/rust-sdk
+/add-dir <path-to>/a2c-smcp-protocol
+/add-dir <path-to>/office4ai
+/add-dir <path-to>/ide4ai
+/add-dir <path-to>/oasp-protocol
+/add-dir <path-to>/office-editor4ai
+/add-dir <path-to>/tfrobot-client
+```
+
+检查方法：读取 `.claude/settings.local.json` 中的 `permissions.additionalDirectories` 字段，确认 8 个仓库目录均已列出。
