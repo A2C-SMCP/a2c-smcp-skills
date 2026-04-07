@@ -1,6 +1,7 @@
 # Troubleshoot — A2C-SMCP Protocol 专属指南
 
 > 通用流程参见 SKILL.md 主文件。
+> **GitHub**: A2C-SMCP/a2c-smcp-protocol
 
 ## 角色
 

@@ -1,6 +1,7 @@
 # Troubleshoot — TFRobot Client 专属指南
 
 > 通用流程参见 SKILL.md 主文件。
+> **GitHub**: A2C-SMCP/tfrobot-client
 
 ## 角色
 

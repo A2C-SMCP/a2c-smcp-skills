@@ -1,6 +1,7 @@
 # Troubleshoot — Office Editor4AI 专属指南
 
 > 通用流程参见 SKILL.md 主文件。
+> **GitHub**: JIAQIA/office-editor4ai
 
 ## 角色
 
