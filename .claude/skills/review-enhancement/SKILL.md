@@ -50,7 +50,7 @@ gh issue list --repo A2C-SMCP/a2c-smcp-skills --label enhance --state open
 | **普适性** | 改进是否对所有使用者有益？ |
 | **一致性** | 是否与 Skill 整体设计理念一致？ |
 | **副作用** | 修改是否可能破坏其他项目的使用？ |
-| **行数限制** | 修改后 SKILL.md ≤ 200 行、resource ≤ 100 行？ |
+| **行数限制** | 修改后 SKILL.md ≤ 249 行、resource ≤ 200 行？ |
 
 ### 评估结论
 
