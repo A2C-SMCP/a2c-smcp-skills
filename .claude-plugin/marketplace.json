@@ -1,0 +1,18 @@
+{
+  "name": "a2c-smcp-skills",
+  "owner": {
+    "name": "A2C-SMCP",
+    "email": "dev@turingfocus.com"
+  },
+  "metadata": {
+    "description": "A2C-SMCP 开源项目 Claude Code 技能与工具集",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "a2c-smcp-toolkit",
+      "description": "A2C-SMCP 开发工具集：Feature 实现、Code Review、Issue 修复、协议文档维护等",
+      "source": "./"
+    }
+  ]
+}
