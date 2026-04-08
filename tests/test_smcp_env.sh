@@ -162,6 +162,95 @@ updated=$(jq -r '.updated_at' "$HOME/.a2c_smcp/dev-env.json")
 today=$(date +%Y-%m-%d)
 assert_eq "updated_at is today" "$today" "$updated"
 
+# ====================== Agent commands ======================
+
+# 15. show-agent when no agent configured
+echo "--- show-agent (not configured) ---"
+output=$(bash "$SMCP_ENV" show-agent dev 2>&1 || true)
+assert_contains "show-agent shows no agent" "No agent configured" "$output"
+assert_exit "show-agent exits 1 when empty" "1" bash "$SMCP_ENV" show-agent dev
+
+# 16. set-agent local with supervisord
+echo "--- set-agent local supervisord ---"
+output=$(bash "$SMCP_ENV" set-agent dev turingfocus supervisord local service=tfrobot-server log_path=/var/log/tf 2>&1)
+assert_contains "set-agent confirms" "Updated agent" "$output"
+assert_contains "set-agent shows type" "turingfocus" "$output"
+
+# 17. show-agent after set
+echo "--- show-agent after set ---"
+output=$(bash "$SMCP_ENV" show-agent dev 2>&1)
+assert_contains "show-agent has type" "turingfocus" "$output"
+assert_contains "show-agent has deployment" "supervisord" "$output"
+assert_contains "show-agent has location" "local" "$output"
+assert_contains "show-agent has config key" "service" "$output"
+assert_contains "show-agent has config value" "tfrobot-server" "$output"
+
+# 18. show includes agent section
+echo "--- show includes agent ---"
+output=$(bash "$SMCP_ENV" show dev 2>&1)
+assert_contains "show has Agent header" "Agent" "$output"
+assert_contains "show has agent type" "turingfocus" "$output"
+
+# 19. verify includes agent
+echo "--- verify includes agent ---"
+output=$(bash "$SMCP_ENV" verify dev 2>&1 || true)
+assert_contains "verify shows agent" "agent" "$output"
+assert_contains "verify agent local OK" "[OK]" "$output"
+
+# 20. set-agent remote with k8s
+echo "--- set-agent remote k8s ---"
+output=$(bash "$SMCP_ENV" set-agent dev turingfocus k8s remote prod-server namespace=tf-prod pod_selector=app=tfrobot 2>&1)
+assert_contains "set-agent remote confirms" "Updated agent" "$output"
+output=$(bash "$SMCP_ENV" show-agent dev 2>&1)
+assert_contains "show-agent k8s deployment" "k8s" "$output"
+assert_contains "show-agent has ssh" "prod-server" "$output"
+assert_contains "show-agent has namespace" "tf-prod" "$output"
+assert_contains "show-agent has pod_selector" "app=tfrobot" "$output"
+
+# 21. verify agent remote
+echo "--- verify agent remote ---"
+output=$(bash "$SMCP_ENV" verify dev 2>&1 || true)
+assert_contains "verify agent remote SSH" "[SSH]" "$output"
+assert_contains "verify agent deployment" "k8s" "$output"
+
+# 22. set-agent docker
+echo "--- set-agent docker ---"
+output=$(bash "$SMCP_ENV" set-agent dev turingfocus docker remote staging container=tf-server log_path=/var/log/tf 2>&1)
+assert_contains "set-agent docker confirms" "Updated agent" "$output"
+output=$(bash "$SMCP_ENV" show-agent dev 2>&1)
+assert_contains "show-agent docker" "docker" "$output"
+assert_contains "show-agent container" "tf-server" "$output"
+
+# 23. remove-agent
+echo "--- remove-agent ---"
+output=$(bash "$SMCP_ENV" remove-agent dev 2>&1)
+assert_contains "remove-agent confirms" "Removed agent" "$output"
+output=$(bash "$SMCP_ENV" show-agent dev 2>&1 || true)
+assert_contains "show-agent after remove" "No agent configured" "$output"
+
+# 24. agent in artifact mode is independent
+echo "--- agent mode isolation ---"
+bash "$SMCP_ENV" set-agent artifact turingfocus k8s local namespace=tf-staging >/dev/null 2>&1
+output=$(bash "$SMCP_ENV" show-agent artifact 2>&1)
+assert_contains "artifact agent exists" "turingfocus" "$output"
+output=$(bash "$SMCP_ENV" show-agent dev 2>&1 || true)
+assert_contains "dev agent still empty" "No agent configured" "$output"
+
+# 25. invalid deployment
+echo "--- invalid deployment ---"
+assert_exit "invalid deployment exits 1" "1" bash "$SMCP_ENV" set-agent dev turingfocus invalid local
+
+# 26. set-agent remote missing ssh
+echo "--- set-agent remote missing ssh ---"
+assert_exit "set-agent remote without ssh exits 1" "1" bash "$SMCP_ENV" set-agent dev turingfocus k8s remote
+
+# 27. JSON structure after agent operations
+echo "--- JSON structure ---"
+has_agent_field=$(jq 'has("agent")' "$HOME/.a2c_smcp/dev-env.json")
+assert_eq "dev config has agent field" "true" "$has_agent_field"
+has_version=$(jq '.version' "$HOME/.a2c_smcp/dev-env.json")
+assert_eq "dev config version is 2" "2" "$has_version"
+
 # -------------------------------------------------------------------
 echo ""
 echo "=== Results: $PASS passed, $FAIL failed ==="
