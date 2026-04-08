@@ -13,9 +13,21 @@ office4ai 使用 loguru 统一日志，通过环境变量配置：
 
 | 环境变量 | 默认值 | 说明 |
 |---------|--------|------|
-| `OFFICE4AI_LOG_DIR` | `./logs` | 日志文件目录，设为空字符串禁用文件日志 |
+| `OFFICE4AI_LOG_DIR` | 平台标准路径（见下表） | 日志文件目录，设为空字符串禁用文件日志 |
 | `OFFICE4AI_LOG_LEVEL` | `INFO` | 最低日志级别 |
 | `OFFICE4AI_LOG_CONSOLE` | `true` | 是否输出到控制台 |
+
+**默认日志目录**（v0.1.1+ 起，基于 `platformdirs`）：
+
+| 平台 | 默认路径 |
+|------|---------|
+| macOS | `~/Library/Logs/office4ai` |
+| Linux | `~/.local/state/office4ai/log` |
+| Windows | `C:\Users\<user>\AppData\Local\office4ai\Logs` |
+
+> **注意**：v0.1.1 之前默认为 `./logs`（相对路径）。如需恢复旧行为，显式设置 `OFFICE4AI_LOG_DIR=./logs`。
+
+**获取当前日志目录**：代码中调用 `office4ai.logging.get_log_dir()` 或查看启动日志 `Log directory: <path>`。
 
 **日志文件**：`{LOG_DIR}/office4ai-mcp_{date}.log`，按天轮转，保留 3 天。
 **统一拦截**：socketio/engineio/aiohttp/uvicorn 的 stdlib logging 均桥接到 loguru。
@@ -26,7 +38,8 @@ office4ai 使用 loguru 统一日志，通过环境变量配置：
 # 调低日志级别，同时输出到控制台和文件
 OFFICE4AI_LOG_LEVEL=DEBUG uv run office4ai-mcp serve
 
-# 日志文件默认在 ./logs/office4ai-mcp_YYYY-MM-DD.log
+# 启动时会输出 "Log directory: <path>"，据此定位日志文件
+# macOS 示例：~/Library/Logs/office4ai/office4ai-mcp_YYYY-MM-DD.log
 ```
 
 **关键日志关注点**：
@@ -36,15 +49,18 @@ OFFICE4AI_LOG_LEVEL=DEBUG uv run office4ai-mcp serve
 
 ## artifact 模式日志收集
 
-通过 `uvx` 直接运行时，日志文件写入**当前工作目录**下的 `./logs/`：
+通过 `uvx` 直接运行时，日志自动写入平台标准目录（不再依赖工作目录）：
 
 ```bash
-# uvx 运行（常见场景）— 日志自动写入 ./logs/
+# uvx 运行（常见场景）— 日志自动写入平台标准目录
 OFFICE4AI_LOG_LEVEL=DEBUG uvx office4ai-mcp serve
 
-# 查看日志文件
-ls ./logs/office4ai-mcp_*.log
-tail -f ./logs/office4ai-mcp_$(date +%Y-%m-%d).log
+# 查看日志文件（macOS 示例）
+ls ~/Library/Logs/office4ai/office4ai-mcp_*.log
+tail -f ~/Library/Logs/office4ai/office4ai-mcp_$(date +%Y-%m-%d).log
+
+# Linux 示例
+# ls ~/.local/state/office4ai/log/office4ai-mcp_*.log
 
 # 如果需要指定日志目录
 OFFICE4AI_LOG_DIR=/tmp/office4ai-logs uvx office4ai-mcp serve
