@@ -26,7 +26,7 @@
 - 4xxx 参数校验（VALIDATION_ERROR ~ PARAM_OUT_OF_RANGE，5 个）
 - 5xxx Excel 专用（WORKSHEET_NOT_FOUND ~ NOT_SUPPORTED，10 个）
 
-## Step 1 差异：协议合规检查
+## Step 2 差异：协议合规检查
 
 OASP 协议规范文档位于 `docs/specification/`：
 
@@ -59,7 +59,7 @@ OASP 协议规范文档位于 `docs/specification/`：
 - 复杂查询/修改：30s
 - 批量操作：60s
 
-## Step 2 差异：向后兼容评估
+## Step 3 差异：向后兼容评估
 
 新增事件需确认：
 - 新字段是否为 Optional？已部署的 AddIn 能否忽略？
@@ -67,7 +67,7 @@ OASP 协议规范文档位于 `docs/specification/`：
 - 新增错误码是否落在正确的范围段？（1xxx/2xxx/3xxx/4xxx/5xxx）
 - 新命名空间是否需要分配独立错误码范围？
 
-## Step 4 差异：代码仓库关联
+## Step 5 差异：代码仓库关联
 
 **实现顺序建议**：
 1. office4ai（Server 端先实现 DTO + Handler + MCP Tool 封装）

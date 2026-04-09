@@ -33,7 +33,7 @@
 - 房间管理 4101-4104（Room Full / Not Found / Not In Room / Cross Room Access）
 - Finder 4201-4204（Document Not Found / Page Out of Range / Element Not Found / Invalid DPE URI）
 
-## Step 1 差异：协议合规检查
+## Step 2 差异：协议合规检查
 
 SMCP 协议规范文档位于 `docs/specification/`：
 
@@ -56,7 +56,7 @@ SMCP 协议规范文档位于 `docs/specification/`：
 - Desktop 系统（window:// 资源聚合）和 Finder 系统（dpe:// 文档目录）是独立子系统
 - 新增子系统级 Feature 需同时评估 client:get_* 事件和 server:update_* 通知事件的配套
 
-## Step 2 差异：向后兼容评估
+## Step 3 差异：向后兼容评估
 
 **各角色实现要求**：
 
@@ -68,7 +68,7 @@ SMCP 协议规范文档位于 `docs/specification/`：
 
 新增事件时需确认：是否为 Agent "建议实现" 变为 "必须实现"？这属于**破坏性变更**。
 
-## Step 4 差异：代码仓库关联
+## Step 5 差异：代码仓库关联
 
 **实现顺序建议**：
 1. python-sdk（参考实现，先验证协议可行性）
