@@ -15,7 +15,7 @@ model: opus
 
 使用 EnterPlanMode 进入计划模式。**所有分析和方案设计必须在 Plan 模式内完成**，审批后才可编码。
 
-### Issue 状态推进（开始处理时）
+### 1.1 Issue 状态推进（开始处理时）
 
 如果输入中包含可追踪系统的 Issue，立即推进状态至"开发中"：
 
@@ -23,6 +23,35 @@ model: opus
 |------|---------|---------|
 | Jira | `PROJECT-N` 或 Jira URL | 使用 `mcp__atlassian__getTransitionsForJiraIssue` 获取可用状态，然后 `mcp__atlassian__transitionJiraIssue` 推进至"开发中"或类似状态（如 In Progress / In Development） |
 | GitHub | `owner/repo#N` 或 URL | 无内置状态机，跳过 |
+
+### 1.2 父 Issue 阅读 —— 北极星校验（强制）
+
+**目的**：当前 Issue 若隶属于某个父 Issue（Epic / Tracking Issue / Parent），父 Issue 承载了整体设计意图、范围边界与验收标准。**修复决策必须服从父 Issue 的北极星方向**，避免局部修复偏离整体架构。
+
+**检测父 Issue**（覆盖常见结构）：
+
+| 平台 | 父子关系载体 | 检测方式 |
+|------|-------------|---------|
+| GitHub | Sub-issues（原生）/ `Parent: #N`、`Part of #N`、`Tracked by #N` 等引用 / 同一 Milestone 下的 tracking issue / Task list checklist 反向引用 | `gh issue view <N> --json body,milestone,parent,trackedInIssues,subIssuesSummary`；再看正文中对父 Issue 的显式引用 |
+| Jira | Epic Link / Parent Link / Sub-task 的 parent | `mcp__atlassian__getJiraIssue` 返回字段中的 `parent` / `customfield_*` Epic Link |
+
+**执行动作**：
+
+1. 检测当前 Issue 是否存在父 Issue（至少检查 1 层直接父级；若有更高层 Epic，也一并读取）
+2. **如果有父 Issue**：读取父 Issue 的 **标题、描述、验收标准、已关联子 Issue 列表、评论中的关键决策**
+3. 提炼父 Issue 的"北极星要素"：
+   - **整体目标**（解决什么本质问题）
+   - **范围边界**（哪些明确属于本次范围、哪些被排除）
+   - **已定下的设计决策**（架构选型、协议方向、兼容性约束）
+   - **验收标准**（父 Issue 层面的 Definition of Done）
+4. 在后续 Step 2～Step 5 的每一次决策点，将方案与北极星要素对齐校验：
+   - 根因分析是否与父 Issue 识别的本质问题一致？
+   - 修复方案是否仍落在父 Issue 划定的范围内？
+   - 是否违反父 Issue 已定下的架构/协议决策？
+5. **如果没有父 Issue**：记录"无父 Issue，以当前 Issue 自身为顶层范围"，跳过此子步骤
+6. **如果父 Issue 与当前 Issue 方向冲突**：停止修复，使用 AskUserQuestion 向用户确认——是父 Issue 需要拆分/调整，还是当前 Issue 归属有误
+
+> **硬性规则**：父 Issue 存在时，其已明确的设计决策优先级高于本 Issue 的局部修复直觉。如需偏离父 Issue 方向，必须显式与用户对齐。
 
 ---
 
