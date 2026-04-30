@@ -78,3 +78,54 @@ OASP 协议规范文档位于 `docs/specification/`：
 - office4ai 负责 MCP Tool → Socket.IO 事件的映射
 - office-editor4ai 负责 Socket.IO 事件 → Office.js API 的映射
 - 两端需同步更新，避免版本不一致导致运行时错误
+
+## Step 3.5 差异：Event 字段 cross-ask 验证清单
+
+新增 OASP 事件 / 数据结构时，**必须**通过 `/cross-ask office-editor4ai` 与 Add-In 工程师逐项核对，必要时级联 `/cross-ask office4ai` 评估 Server 离线路径。
+
+### A. 字段与 Office.js API 的映射
+- 每个字段对应的 `Word.*` / `Excel.*` / `PowerPoint.*` API 路径（精确到属性名）
+- 每个枚举值是否在 Office.js 对应 enum 中（注意大小写、过去分词形：`Centered` 而非 `Center`、`Justified` 而非 `Justify`）
+- 字段作用粒度（单元格 / 行 / 表 / 工作表）与 API 粒度是否对齐
+
+### B. 响应字段的可达性
+- 响应字段能直接从 Office.js 拿到，还是需要 Add-In 计算？
+- 计算字段在边界场景下是否准确（如已合并表格的 `cellCount`、含跨页段落的 `paragraphCount`）
+
+### C. 错误码命中
+- 每个新错误码是否与 `error-handling.md` 既有定义冲突（号段、语义）
+- 每种 Office.js 异常映射到哪个错误码（特别是 `GeneralException` 的细分）
+
+### D. 跨命名空间一致性
+- 同语义字段在 /word /ppt /excel 命名是否对齐（如 `horizontalAlignment` vs `alignment`）
+- 共享数据结构（如 `CellFormat` / `TableSummary`）是否值得提到 `data-structures.md`
+
+### E. 实现路径回退（OASP 级联）
+
+office-editor4ai 反馈某字段为「Office.js 完全不支持」时，**必须**继续 `/cross-ask office4ai` 评估能否通过 OOXML 离线修改（python-docx / openpyxl / python-pptx）实现：
+
+```
+协议字段草案
+    │
+    ▼
+cross-ask office-editor4ai (Add-In / Office.js)
+    ├── A 直接支持        → 进入 Step 4
+    ├── B 需 hack         → 评估 hack 成本，必要时调整字段语义
+    └── C 完全不支持
+        ▼
+        cross-ask office4ai (Server / OOXML 离线)
+        ├── 可实现        → 协议保留字段，事件文档标注「实现路径：Server 离线」
+        └── 也无法实现    → 移除字段，changelog 说明取舍理由
+```
+
+**实现路径标注**：若字段最终走 Server 离线实现，对应事件文档（events-word.md 等）必须加：
+
+````markdown
+!!! note "实现路径：Server 离线修改"
+    本字段在 Office.js 中无对应 API，由 office4ai 通过 OOXML 离线修改实现。
+    - 端到端延迟较纯 Add-In 路径高（Add-In 暂存 → Server 处理 → Add-In 重载）
+    - 重载期间用户编辑会被回滚
+    - 不支持在 unsaved 文档上执行
+````
+
+> **门控**：任一 cross-ask 反馈含 P0（cast 不过 / API 不存在 / 错误码冲突），禁止合并到 main，必须 round-N 修订后再次 cross-ask 验证通过。

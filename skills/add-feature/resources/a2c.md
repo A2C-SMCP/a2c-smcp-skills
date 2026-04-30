@@ -84,3 +84,9 @@ SMCP 协议规范文档位于 `docs/specification/`：
 - 协议类型在 smcp crate 中定义
 - 各角色 crate（smcp-agent / smcp-computer / smcp-server-core / smcp-server-hyper）按需跟进
 - Feature flags 控制模块启用（agent/computer/server/full/e2e）
+
+## Step 3.5 差异：A2C 协议字段 cross-ask 指引
+
+新增 SMCP 事件 / 数据结构时，按主文件 Step 3.5 通过 `/cross-ask python-sdk` 与 `/cross-ask rust-sdk` 验证消费方实现，重点核对：Pydantic / serde 双侧类型一致、sync/async 双栈同步落地、Tokio 任务模型不冲突、错误码落在正确号段（4001-4005 / 4101-4104 / 4201-4204）且与既有不冲突。
+
+> 完整 A-E 清单（同形于 oasp.md）待后续 issue 单独跟进。
