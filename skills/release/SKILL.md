@@ -20,7 +20,7 @@ A2C-SMCP 各项目的发布共享同一骨架，但发布目标不同（SDK 包 
    版本已更新     bump 生成 tag       CI 自动发布
 ```
 
-每个项目把上述四步映射到自己的工具链。**动手前先读 `resources/<project>.md`**（当前已文档化：`a2c-smcp-protocol`）。其他项目暂无 resource 时，先读该仓库的 `.github/workflows/*publish*.yml`、`pyproject.toml` / `Cargo.toml` 确认实际机制，**不要凭经验臆测**。
+每个项目把上述四步映射到自己的工具链。**动手前先读 `resources/<project>.md`**（当前已文档化：`a2c-smcp-protocol`、`oasp-protocol`）。其他项目暂无 resource 时，先读该仓库的 `.github/workflows/*publish*.yml`、`pyproject.toml` / `Cargo.toml` 确认实际机制，**不要凭经验臆测**。
 
 ---
 
@@ -80,8 +80,10 @@ git push origin vX.Y.Z            # 推送 tag
 | python-sdk | `publish.yml` | PyPI |
 | rust-sdk | GitHub release `published` → `publish.yml` | crates.io |
 | a2c-smcp-protocol | push `main`（docs/mkdocs 变更）→ `deploy-pages.yml` | GitHub Pages（自动）；公司服务器需**手动** `inv docs.deploy`，见 resource |
+| oasp-protocol | CI `docs.yml` 仅 `workflow_dispatch` 且硬编码 `0.1.0`——**版本化发布走本地** `inv docs.deploy --version=X.Y.Z` | GitHub Pages + 公司服务器；服务器同步用 `inv docs.push-to-server`（tar-over-SSH），见 resource |
 
 > rust-sdk 走 crates.io 时由 GitHub Release 发布触发，可能还需 `gh release create vX.Y.Z`——动手前读该仓库 workflow 确认。
+> 文档类项目的版本号未必来自 `pyproject.toml`（如 oasp 由 changelog 顶部驱动），发布前确认版本来源，见 resource。
 
 ---
 
@@ -109,3 +111,4 @@ CI 跑完不等于发布成功，必须验收。通用项：
 | 假设 CI 一定成功 | 发布后查 `gh run list` + 验制品可达 |
 | 对未文档化项目凭经验臆测 | 先读该仓库的 publish workflow 与版本配置 |
 | 文档发布只发 GitHub Pages | 协议仓库公司服务器需手动部署，见 resource |
+| 服务器部署任务打印 ✅ 就当成功 | 部分项目 git-pull 同步会静默假报成功，须验服务器实际刷新，见 resource |

@@ -28,7 +28,7 @@ gh issue view <number> --repo A2C-SMCP/a2c-smcp-skills
 ### 未指定 → 列出待处理
 
 ```bash
-gh issue list --repo A2C-SMCP/a2c-smcp-skills --label enhance --state open
+gh issue list --repo A2C-SMCP/a2c-smcp-skills --label enhancement --state open
 ```
 
 展示列表供用户选择。

@@ -117,7 +117,7 @@ gh auth status
 gh issue create --repo A2C-SMCP/a2c-smcp-skills \
   --title "<格式化标题>" \
   --body "<格式化内容>" \
-  --label "enhance"
+  --label "enhancement"
 ```
 
 提交成功后输出 Issue 链接。
