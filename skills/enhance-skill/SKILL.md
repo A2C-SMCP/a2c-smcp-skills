@@ -56,15 +56,21 @@ ls {marketplaceRoot}/skills/<skill-name>/
 
 ## Step 4：收集版本信息
 
-```bash
-# Marketplace 版本
-git -C {marketplaceRoot} log --oneline -1
+**Marketplace 版本**：从本 Skill 的 base directory 路径中提取，**无需 Bash**。
 
-# 当前项目版本
+插件缓存路径形如 `~/.claude/plugins/cache/<repo>/<plugin>/<hash>/skills/<skill-name>/`，其中 `<hash>` 段即 Marketplace 版本（如 `231b1476959b`）。缓存目录**不是 git 仓库**，切勿对它执行 `git log`（会报 `fatal: not a git repository`）。
+
+> 开发态从本地 git checkout 运行时，路径无 `cache/.../<hash>` 段——此时才用 `git -C {marketplaceRoot} log --oneline -1` 获取。
+
+**当前项目版本**：
+
+```bash
 git log --oneline -1
 ```
 
-记录 Marketplace commit hash、当前项目名称和 commit hash。
+> Marketplace 版本从路径解析、不调用 Bash；项目版本的 `git log` 也不要与其它无关命令并行批量执行，避免一个调用失败连带取消同批次调用。
+
+记录 Marketplace 版本 hash、当前项目名称和 commit hash。
 
 ## Step 5：检查 gh CLI 可用性
 
