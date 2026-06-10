@@ -9,6 +9,8 @@ model: opus
 
 目标不是"代码能不能跑"，而是"这段变更是否让项目更健康"。
 
+> **复用**：本 skill 的审查 rubric 是全项目唯一来源。`code-reviewer` 子代理（隔离上下文消偏见）与 add-feature / fix-issue 的内嵌审查门控均复用本 rubric，不另写。内嵌门控流水线见 `skills/code-review/resources/embedded-review-gate.md`。
+
 ---
 
 ## Step 1：确定审查范围

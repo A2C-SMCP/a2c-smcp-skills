@@ -1,7 +1,7 @@
 ---
 name: fix-issue
 description: 以架构师视角分析并修复问题，强制 plan 模式，杜绝补丁式修复。涉及协议时严格按协议来，协议有问题则协议先行调整，代码再跟进。当遇到 Bug 反馈、错误日志或功能异常时使用。
-argument-hint: "<问题描述、错误日志或 Issue 链接>"
+argument-hint: "<问题描述、错误日志或 Issue 链接> [--review <block|all|discuss>]"
 model: opus
 ---
 
@@ -186,6 +186,14 @@ model: opus
 
 ---
 
+## Step 7.5：隔离审查硬门控（绿灯后强制）
+
+全量绿灯后，**禁止自评通过直接收尾**。拉起隔离上下文的 `code-reviewer` 子代理客观复审，按 `--review` 等级走 `/fix-review`，🔴 未清零不算修复完成。子代理拉起时须传入「问题意图」（根因结论 / 验收标准 / 父 Issue 北极星），**不传**实现自评。
+
+> 流水线、`--review` 分级、琐碎豁免（含 `--review none`）见单一源：`skills/code-review/resources/embedded-review-gate.md`。
+
+---
+
 ## Step 8：总结、Issue 回复与状态推进
 
 向用户汇报：根因、修复方式、变更文件、测试覆盖、架构影响。
@@ -226,3 +234,4 @@ model: opus
 - **禁止绕过协议** — 协议有问题则协议先行
 - **禁止无确认实施** — 方案必须经用户审批
 - **禁止重复封装** — 优先复用现有工具
+- **禁止跳过独立审查** — 绿灯后必须经隔离上下文 code-reviewer 子代理复审，🔴 未清零不得收尾（琐碎改动可豁免）
