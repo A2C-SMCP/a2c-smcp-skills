@@ -79,6 +79,10 @@ OASP 协议规范文档位于 `docs/specification/`：
 - office-editor4ai 负责 Socket.IO 事件 → Office.js API 的映射
 - 两端需同步更新，避免版本不一致导致运行时错误
 
+## office4ai 实现模式判定（Step 6 前：服务端生产 vs 纯中转）
+
+OASP 0.3.0 起 Python MCP Server 可**直接生产 / 修改文档内容**（非纯中转）。office4ai 动代码前先判定本 feature 是「服务端生产能力工具」还是「纯中转」——若为前者，须按双路径路由 / 反应式降级 / `document_lock` / `requiresReload` / 测试矩阵落地，详见单一源 `{baseDir}/resources/office4ai.md`（含图表三件套已真机验证样板与 3003/3016/3015 错误码锚点）。
+
 ## Step 3.5 差异：Event 字段 cross-ask 验证清单
 
 新增 OASP 事件 / 数据结构时，**必须**通过 `/cross-ask office-editor4ai` 与 Add-In 工程师逐项核对，必要时级联 `/cross-ask office4ai` 评估 Server 离线路径。
