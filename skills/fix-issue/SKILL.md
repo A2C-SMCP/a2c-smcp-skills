@@ -198,7 +198,7 @@ model: opus
 
 ## Step 7.5：隔离审查硬门控（绿灯后强制）
 
-全量绿灯后，**禁止自评通过直接收尾**。拉起隔离上下文的 `code-reviewer` 子代理客观复审，按 `--review` 等级走 `/fix-review`，🔴 未清零不算修复完成。子代理拉起时须传入「问题意图」（根因结论 / 验收标准 / 父 Issue 北极星），**不传**实现自评。
+全量绿灯后，**禁止自评通过直接收尾**。用 Agent 工具拉起隔离上下文的 `a2c-smcp-toolkit:code-reviewer` 子代理客观复审，按 `--review` 等级走 `/fix-review`，🔴 未清零不算修复完成。子代理拉起时须传入「问题意图」（根因结论 / 验收标准 / 父 Issue 北极星），**不传**实现自评。
 
 > 流水线、`--review` 分级、琐碎豁免（含 `--review none`）见单一源：`skills/code-review/resources/embedded-review-gate.md`。
 
