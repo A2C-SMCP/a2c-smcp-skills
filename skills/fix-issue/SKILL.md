@@ -106,8 +106,7 @@ model: opus
 
 读取对应协议仓库的规范文档，与代码实现对比：
 
-- **A2C 协议**：读取 a2c-smcp-protocol 的 `docs/specification/` 下相关文件
-- **OASP 协议**：读取 oasp-protocol 的 `docs/specification/` 下相关文件
+- **A2C / OASP 协议**：分别读取 a2c-smcp-protocol / oasp-protocol 的 `docs/specification/` 下相关文件
 
 > 协议详情参见 `skills/add-feature/resources/a2c.md` 和 `skills/add-feature/resources/oasp.md`。
 
@@ -120,6 +119,8 @@ model: opus
 | 协议模糊/未覆盖此场景 | 使用 AskUserQuestion 与用户确认：是按现有理解修复，还是先明确协议？ |
 
 > **硬性规则**：代码仅可实现协议已定义的行为。如果修复需要改变协议语义，必须协议先行。
+
+> **运行时上交 advance-plan**：若「协议本身有问题」进一步**动态展开成跨项目推进树**（协议缺口传导多个 SDK/客户端、衍生多个跨仓 Issue、需按波次编排 + 收敛）→ 上交 `/advance-plan` 以本节点为根接管级联与收敛，解决后返回本流程收尾。单仓内普通展开不上交。触发边界见单一源：`skills/advance-plan/SKILL.md`「何时上交 advance-plan」。
 
 ---
 
