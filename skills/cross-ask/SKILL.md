@@ -1,6 +1,6 @@
 ---
 name: cross-ask
-description: 跨项目问询报告生成。当前项目工程师遇到需要其他项目工程师协助的问题时，生成结构化问询问卷，由用户转发给对应工程师并收集回复。解决工程师视角局限、不知道该问什么的问题。
+description: 跨项目问询报告生成。当前项目工程师遇到需要其他项目工程师协助的问题时，生成结构化问询问卷，由用户转发给对应工程师并收集回复。解决工程师视角局限、不知道该问什么的问题。SMCP 核心三仓（a2c-smcp-protocol / python-sdk / rust-sdk）之间的问询无论协议是否介入，一律在 a2c-smcp-protocol 创建 GitHub Discussion 留痕，被问方用 answer-ask 回复。
 argument-hint: "<目标项目> <问题简述或提问方向>"
 ---
 
@@ -28,6 +28,8 @@ argument-hint: "<目标项目> <问题简述或提问方向>"
 | `client` / `tfrobot` | tfrobot-client | Computer 桌面客户端（Tauri、MCP 服务器管理） |
 
 未提供参数 → 用 `AskUserQuestion` 引导选择目标项目和描述问题。
+
+> **发问前摸底（建议）**：问询主题涉及三仓在推事项（协议分歧、SDK 对齐）时，先按 `skills/issue-radar/SKILL.md` 扫一遍态势，避免问出已有结论、或已有人推进的问题。
 
 ---
 
@@ -91,6 +93,43 @@ argument-hint: "<目标项目> <问题简述或提问方向>"
 3. **格式具体**：明确期望的回答格式（如 TypedDict 定义、Rust struct、Office JS API 等）
 4. **数量克制**：通常 3-6 个问题，不超过 8 个
 5. **项目特有字段**：必须覆盖 resource 模板中定义的必填字段
+
+---
+
+## Step 4：SMCP 核心三仓留痕（强制门控）
+
+**适用条件**：当前项目与目标项目**均属于**核心三仓（a2c-smcp-protocol / python-sdk / rust-sdk）。不适用时维持原流程：问卷输出聊天框，由用户转发、回复贴回会话。
+
+三仓之间的所有问询——**无论协议是否需要介入**——一律在 a2c-smcp-protocol 创建 GitHub Discussion 留痕。protocol 仓是三仓协同的唯一留痕中枢：方案分歧、SDK 对齐讨论都必须可追溯，杜绝口头/会话内对齐后各自遗忘。
+
+### 4.1 创建 Discussion（经用户确认问卷后）
+
+- **标题**：`[cross-ask] <来源项目> → <目标项目>: <主题>`
+- **类别**：Q&A
+- **正文**：目标项目非 a2c-smcp-protocol 时，顶部标注 `> ⚠️ 本问询需要 <目标项目> 工程师回复，协议侧无需介入（如判定涉及协议管辖请协议侧补充回复）`；随后为 Step 3 问卷全文；尾注替换为 `*请目标项目工程师执行 /answer-ask <本 Discussion 链接> 回复（回复须注明来源项目）。*`
+
+```bash
+# 查 repositoryId 与 Q&A 类别 id
+gh api graphql -f query='{ repository(owner: "A2C-SMCP", name: "a2c-smcp-protocol") {
+  id discussionCategories(first: 20) { nodes { id name } } } }'
+
+# 创建 Discussion
+gh api graphql -F repoId=<repositoryId> -F catId=<Q&A 类别 id> \
+  -F title='[cross-ask] <来源> → <目标>: <主题>' -F body='<问卷全文>' -f query='
+mutation($repoId: ID!, $catId: ID!, $title: String!, $body: String!) {
+  createDiscussion(input: {repositoryId: $repoId, categoryId: $catId, title: $title, body: $body}) {
+    discussion { number url } } }'
+```
+
+### 4.2 显式转达（必须输出）
+
+创建成功后必须向用户明确输出：
+
+1. Discussion 链接
+2. **转达指令**：「请将该链接转达给 <目标项目> 工程师，由其在自己项目的 Claude Code 会话中执行 `/answer-ask <链接>` 回复」
+3. 需要多个项目回复时，逐一点名待回复项目清单，每个项目都要求用户显式转达
+
+> **回复闭环**：回复落在 Discussion 评论中，继续处理时直接读取 Discussion，无需用户手工粘贴回复。
 
 ---
 
