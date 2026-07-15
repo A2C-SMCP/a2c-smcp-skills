@@ -23,6 +23,8 @@ argument-hint: "<根 Issue#ID | Epic | 一句话推进目标>"
 | `release` | 协议子节点「完成」判据 = **协议已发布** → 调用它收口。 |
 | `issue-report` | 递归中新发现的跨仓工作 → 调用它建 Issue。 |
 | `cross-ask` | 需其他项目工程师协助的决策点 → 调用它。 |
+| `issue-radar` | **现状勘察增强**：核心三仓节点在 Phase 1 拉起它补充实时态势（在推 PR / Discussion / 镜像 Issue / 方案冲突）。 |
+| `consolidate-issues` | **编排前预处理**：三仓 Issue 存在重复 / 镜像 / 冲突堆积时，先调它消解归并成 Epic，再进本 skill 排波次。 |
 
 **split-task vs advance-plan**：前者是**静态一次性切刀**，后者是**运行时动态编排**——已有 + 新发现的节点排波次，展开-收敛不断循环。
 
@@ -57,6 +59,7 @@ argument-hint: "<根 Issue#ID | Epic | 一句话推进目标>"
 1. 每个相关 Issue 的 open/closed、关联 PR、blocked 状态
 2. 归属：**协议仓库**（a2c-smcp-protocol / oasp-protocol）vs **代码仓库**（python-sdk / rust-sdk / office4ai / ide4ai / 客户端）
 3. 已存在的父子 / Milestone 关联
+4. 核心三仓节点 → 按 `skills/issue-radar/SKILL.md` 补充实时态势（在推 PR / Discussion / 镜像 Issue）；发现重复/冲突堆积 → 先 `/consolidate-issues` 消解再编排
 
 **准出**：相关节点现状清单 + 跨仓归属明确。
 
