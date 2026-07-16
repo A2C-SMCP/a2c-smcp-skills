@@ -29,7 +29,7 @@
 ### 跨模块"先后顺序"硬约束
 
 - 协议数据结构（`smcp.py` TypedDict）改动必须在最早一刀；agent/computer/server 不可在其之前 merge
-- 涉及协议语义的改动**不得超前于 a2c-smcp-protocol 发布**（协议先行，见主文件 Phase 0.6）
+- 涉及协议语义的改动分级不超前：develop 实现不超前于 a2c-smcp-protocol `develop`（已 push origin）；合 main / 发版不超前于协议正式发布（协议先行，见主文件 Phase 0.6）
 - 接口签名变更须同刀同步其单测 mock，禁止一刀只改实现不改 mock（中间态 mock 漂移）
 
 ---

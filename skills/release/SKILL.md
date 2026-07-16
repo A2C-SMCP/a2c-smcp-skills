@@ -44,6 +44,7 @@ A2C-SMCP 各项目的发布共享同一骨架，但发布目标不同（SDK 包 
 | 版本单一来源 | 版本号只在一处定义（Python: `pyproject.toml`；Rust: `Cargo.toml`），其余文件由 bump 工具同步 |
 | 测试/CI 绿 | 最近一次主干 CI run 成功（`gh run list`） |
 | 变更已记录 | CHANGELOG / release notes 已更新（如项目有此约定） |
+| **协议依据校验**（SDK 仓强制） | 本仓声明的协议版本（python-sdk: `a2c_smcp/__init__.py` 的 `PROTOCOL_VERSION`；rust-sdk 同理）必须等于协议仓 `main` 最新已发布 tag（`gh release view --repo A2C-SMCP/a2c-smcp-protocol` 或 `git ls-remote --tags`）。不等 → **阻断发版**，提示「协议 vX.Y.Z 尚未发布，不得发布依赖它的 SDK」 |
 
 项目特有的前置项见 `resources/<project>.md`。
 
@@ -107,6 +108,7 @@ CI 跑完不等于发布成功，必须验收。通用项：
 | 反模式 | 正确做法 |
 |--------|---------|
 | 手改个别文件的版本号 | 只跑 bump 工具，保持单一来源同步 |
+| SDK 声明着未发布的协议版本就发版 | 前置检查「协议依据校验」：PROTOCOL_VERSION == 协议 main 最新 tag，不等则阻断 |
 | 推送 tag 不与用户确认 | 不可逆对外动作前用 AskUserQuestion 确认 |
 | 假设 CI 一定成功 | 发布后查 `gh run list` + 验制品可达 |
 | 对未文档化项目凭经验臆测 | 先读该仓库的 publish workflow 与版本配置 |

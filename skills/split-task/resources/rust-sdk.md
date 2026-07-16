@@ -32,7 +32,7 @@
 
 - `smcp`（核心类型）改动必须在最早一刀；下游 crate 不可在其之前 merge（否则 workspace 编译破）
 - trait / 接口签名变更须**同刀同步所有 impl 与 mock**，禁止一刀只改 trait 定义留下游 crate 编译红
-- 涉及协议语义的改动**不得超前于协议发布**（协议先行，见主文件 Phase 0.6）
+- 涉及协议语义的改动分级不超前：develop 实现不超前于协议 `develop`（已 push origin）；合 main / 发版不超前于协议正式发布（协议先行，见主文件 Phase 0.6）
 - 编译期/类型期耦合（trait 定义 + 首个 impl）属**必要打包**，宁可一刀大，不引入过渡 trait
 
 ---
