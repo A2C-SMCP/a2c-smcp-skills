@@ -202,6 +202,8 @@ model: opus
 4. 如涉及协议类型，确认**跨 SDK 序列化兼容性**
 
 > 验证命令按项目参见 `{baseDir}/resources/<project>.md`。
+>
+> ⚠️ Rust 项目遇 IDE（rust-analyzer）抢 build 锁卡顿时，按 `resources/rust-sdk.md`「验证加速」绕开（lib 优先 / 后台跑 / 跳已知 flake / 勿重复触发编译），勿干等全量套件。
 
 ---
 
