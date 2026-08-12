@@ -72,9 +72,22 @@ argument-hint: "[<要学习的概念|技术|代码片段>]"
 
 **目标**：为接下来的教学收集真实、准确、有来源的证据。
 
-### 2.1 搜索策略
+### 2.1 搜索策略分层
 
-对目标概念执行至少 **2 次独立搜索**（不同角度，交叉验证）：
+不是所有论断都需要搜索。先分层判断，再按需执行：
+
+| 层级 | 触发条件 | 示例 |
+|------|---------|------|
+| **必须搜** | 涉及版本差异/性能数据/选型对比/最佳实践/API 用法 | "Rust 2024 edition 的 lifetime 变更"、"React 19 vs 18 性能对比" |
+| **建议搜** | 设计缘由/历史背景/社区共识/概念定义（不确定细节时） | "为什么 Go 这么久才加泛型"、"async/await 的设计起源" |
+| **可不搜** | 语言基础语法/普适定义/纯逻辑推导/你确信无误的常识 | "if 语句的作用"、"什么是变量" |
+
+**纪律**：
+- 涉及「X 比 Y 快/好」「X 在 Z 版本后变了」「官方推荐做法」→ **必须搜**
+- 不确定属于哪层 → 往上一级靠（「建议搜」升为「必须搜」）
+- 搜索结果与训练记忆冲突 → **以搜索结果为准**
+
+对「必须搜」和「建议搜」层级，从以下角度执行至少 2 次独立搜索（交叉验证）：
 
 | 搜索角度 | 示例查询 |
 |----------|---------|
@@ -84,11 +97,10 @@ argument-hint: "[<要学习的概念|技术|代码片段>]"
 | 历史背景 | `"<concept>" history design rationale RFC` |
 | 常见误区 | `"<concept>" common misconceptions pitfalls` |
 
-### 2.2 证据标准
+### 2.2 证据标准与引用
 
 - 优先：官方文档 → 核心维护者博客/演讲 → 权威技术媒体深度分析
-- 记录每条关键信息的来源 URL，在 Step 3-4 中引用
-- 搜索结果与训练记忆冲突 → **以搜索结果为准**
+- **内联引用**：在 Step 3-4 的每个关键论断后，用 `([来源描述](URL))` 标注，让用户可随时追溯到原文
 - 找不到可靠来源支撑的论断 → 标注「存疑」，不当作事实陈述
 
 ---
@@ -238,3 +250,93 @@ argument-hint: "[<要学习的概念|技术|代码片段>]"
 | 不引用来源 | 每条实证信息附 URL，让用户可自己深入 |
 | 忽略历史背景 | 设计决策通常有历史原因，RFC/PEP/设计文档比代码注释更有解释力 |
 | 对不同背景用户用同一套类比 | 从 context/memory 推断知识地图后定制类比 |
+
+---
+
+## 附录：完整 Worked Example
+
+以下展示 teach-me 在真实场景中的完整执行。**假设场景**：Python 专家在学习 Rust SDK 开发，遇到 borrow checker 报错。
+
+### Step 0 → 背景推断
+
+**从会话上下文获取**：
+- 当前工作目录 `/Users/jqq/RustroverProjects/rust-sdk`，`crates/` 目录结构
+- 用户消息：「这个 borrow checker 报错我看不懂，为什么不能同时借给两个地方？」
+
+**从 Memory 获取**：
+- Python 深度：LangChain Contributor，熟悉 asyncio/Protocol/ABC
+- C/C++ 背景：大学 C，后续 WebRTC C++ 实时系统
+- Rust 现状：借助 Claude Code 驾驭项目，语言细节学习中
+
+→ **知识地图**：精通 Python（主类比）| 了解 C++（第二参照系）| 目标：Rust ownership + borrowing
+
+### Step 1 → 明确目标
+
+用户粘贴了 `error[E0499]: cannot borrow `*` as mutable more than once` 错误。
+
+→ **确认**：「我们要搞清楚的是：Rust 为什么不允许同时两个可变借用？这和你熟悉的 Python 多引用有什么本质不同？」
+
+### Step 2 → 实证研究
+
+**分层判断**：涉及「设计缘由」→ **建议搜**（但考虑到是核心概念，升为「必须搜」）
+
+搜索 1：`"why does Rust forbid multiple mutable references" design rationale`
+  → 找到 Rust Book §4.2, StackOverflow 高票回答，Niko Matsakis 博客
+搜索 2：`Rust borrow checker vs Python reference counting comparison`
+  → 找到 fasterthanli.me: "From Python to Rust: Ownership"
+
+**来源记录**：
+- [The Rust Book §4.2 — References and Borrowing](https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html)
+- [Niko Matsakis — Borrow Checker design rationale](https://smallcultfollowing.com/babysteps/blog/2016/04/27/non-lexical-lifetimes-introduction/)
+- [fasterthanli — From Python to Rust: Ownership](https://fasterthanli.me/articles/from-python-to-rust-1)
+
+### Step 3 → 类比链条
+
+**主类比（Python）**：
+
+> Rust 的可变借用规则就像 Python 里你在遍历 list 时不能修改它——`for x in lst: lst.append(x)` 会直接抛 `RuntimeError`。但 Rust 把这个检查从运行时移到了编译期，而且更严格：任何时候只要有一个可变引用在手里，就不能再有其他引用。
+
+**代码对照**：
+```python
+# Python：运行时检查，只在特定场景生效
+lst = [1, 2, 3]
+for x in lst:
+    lst.append(x)  # RuntimeError: list changed size during iteration
+# 其他场景不检查：
+a = lst
+b = lst  # 完全没问题，a 和 b 指向同一个 list
+a.append(4)  # b 也会看到变化 — 这可能导致 bug
+```
+
+```rust
+// Rust：编译期检查，覆盖所有场景
+let mut v = vec![1, 2, 3];
+let a = &mut v;  // 可变借用
+let b = &mut v;  // 编译错误！error[E0499]: cannot borrow `v` as mutable more than once
+// 但不可变借用可以多个：
+let a = &v;
+let b = &v;  // OK — 只读共享
+```
+
+**第二参照系（C++）**：
+
+> 如果你了解 C++，这更像 unique_ptr 的语义——同一时间只有一个所有者。但关键区别：C++ 的 unique_ptr 是运行时概念（你可以用 `std::move` 转移所有权后继续用原变量，未定义行为），Rust 编译器直接禁止 use-after-move（[Niko Matsakis 博客](https://smallcultfollowing.com/babysteps/blog/2016/04/27/non-lexical-lifetimes-introduction/)）。
+
+### Step 4 → 差异分析
+
+| 断裂点 | 为什么 Rust 这么做 | 为什么 Python 不那么做 | 连锁反应 |
+|--------|-------------------|----------------------|---------|
+| 编译期 vs 运行时检查 | Zero-cost abstraction 是核心目标——Rust 最初要替代 C++ 写 Servo 浏览器引擎，性能必须接近 C++（[Rust RFC 0001](https://github.com/rust-lang/rfcs/blob/master/text/0001-rfc-process.md)） | Python 设计目标是最少代码完成最多事，Guido 从来没打算让 Python 做系统编程（[PEP 20 — Zen of Python](https://peps.python.org/pep-0020/)） | Rust 无运行时 GC/反射 → serde 必须用 derive macro 生成序列化代码；Python 的 pickle 可以直接运行时检查对象 |
+| 可变借用唯一性 | 防止 data race + 让编译器做别名分析优化——LLVM 可以利用「无别名」假设生成更快的代码（[The Rust Book §4.2](https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html)） | Python 有 GIL，天然线程安全——多线程不会同时执行 Python 字节码（[Python GIL 文档](https://wiki.python.org/moin/GlobalInterpreterLock)） | Rust 能安全地多线程并发，Python 靠 GIL 牺牲多核性能；但 Python 的并发模型对 I/O 密集型任务更友好（asyncio） |
+
+### Step 5 → 验证
+
+**检验问题**：
+> 「如果我想写一个函数，接收两个 `&str`，返回较长的那个——返回值应该标注什么生命周期？编译器为什么强制你标注，而不像 Python 那样自动推断？」
+
+**答案方向**：需要标注 `'a` 生命周期让编译器知道返回值借用的是一样长的两个引用——因为 Rust 编译器不做跨函数分析，它只看函数签名。Python 有 GC，所有对象活在堆上，自然没有这个问题。
+
+**最小下一步**：
+1. 在项目 `crates/smcp-computer/src/mcp_clients/stdio_client.rs` 里找所有 `&self` 方法，重新读一遍——这些就是不可变借用
+2. 接着读 [The Rust Book §10.3 — Validating References with Lifetimes](https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html)，只看这一节，不要跳章
+
