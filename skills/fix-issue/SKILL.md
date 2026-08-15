@@ -61,6 +61,16 @@ model: opus
 - 🔴 有人推进但方案冲突/存疑 → **显式向用户报告推进现状**，请用户协调对应工程师暂停、对齐方案后再继续；**用户未决策不得进入 Step 2**
 - 后续任一步骤中方案发生实质变化（根因结论改变、修复方向调整）→ **重走本门控**并告知用户，由用户协同相关方
 
+### 1.4 Milestone 开工门控（SMCP 核心三仓强制）
+
+当前项目属于核心三仓（a2c-smcp-protocol / python-sdk / rust-sdk）且输入包含可追踪 Issue 时，进入 Step 2 前**必须**按 `skills/issue-radar/resources/core-governance.md` §4 校验 Milestone：
+
+1. 读 Issue 的 milestone 字段（`gh issue view <N> -R <owner/repo> --json milestone`）
+2. **已挂版本化 Milestone**（vX.Y.Z，X.Y 与协议仓及对称 SDK 对齐）→ 继续
+3. **未挂 / 挂了无版本号 Milestone** → **阻止开工**，AskUserQuestion 请用户归入现有或创建版本化 Milestone（命令见 core-governance §4.4）；用户未决策不得进入 Step 2
+
+> 无 Issue 的本地修复（如直接拿日志来修）不受此门控，但 Step 5 方案中必须说明将挂靠的版本化 Milestone。
+
 ---
 
 ## Step 2：问题定位与根因分析（Plan 模式内）
@@ -103,18 +113,22 @@ model: opus
 
 ### 3.1 判定是否涉及协议
 
+按 `skills/issue-radar/resources/core-governance.md` §2 执行协议归属判定，两个硬动作不可跳过：
+
+1. **可读性前置**：本地读不到协议仓 → 停止判定，要求开发者 `git clone git@github.com:A2C-SMCP/a2c-smcp-protocol.git` 并 `/add-dir` 后重试
+2. **develop 核对**：`git grep` 协议仓 develop 分支 `docs/`（最新近况，可接受新需求），本次涉及的结构/事件名命中规范 → 协议辖区，与"看起来像 SDK 内部语义"无关
+
 | 信号 | 判定 |
 |------|------|
-| 事件名/字段名/数据结构与协议规范不一致 | 涉及协议 |
-| 错误码使用不符合协议定义 | 涉及协议 |
-| 跨 SDK 行为不一致（Python vs Rust） | 可能涉及协议 |
-| 纯业务逻辑 Bug | 不涉及协议 |
+| 结构/事件/字段/错误码/序列化格式定义于协议规范，本次变更其形状或语义 | 协议辖区（经 develop grep 命中确认） |
+| 跨 SDK 行为不一致（Python vs Rust） | 可能涉及协议，须经 develop grep 定案 |
+| 纯业务逻辑 Bug（协议未定义、明文留给 SDK 的实现选择） | SDK 自治区 |
 
 ### 3.2 协议侧是否正确？
 
-读取对应协议仓库的规范文档，与代码实现对比：
+读取对应协议仓库的规范文档（**以 develop 分支为准**），与代码实现对比：
 
-- **A2C / OASP 协议**：分别读取 a2c-smcp-protocol / oasp-protocol 的 `docs/specification/` 下相关文件
+- **A2C / OASP 协议**：分别读取 a2c-smcp-protocol / oasp-protocol 的 `docs/specification/` 下相关文件（`git -C <protocol> fetch origin develop` 后 `git grep -n "<关键词>" origin/develop -- docs/`）
 
 > 协议详情参见 `skills/add-feature/resources/a2c.md` 和 `skills/add-feature/resources/oasp.md`。
 
@@ -129,6 +143,16 @@ model: opus
 > **硬性规则**：代码仅可实现协议已定义的行为。如果修复需要改变协议语义，必须协议先行。
 
 > **运行时上交 advance-plan**：若「协议本身有问题」进一步**动态展开成跨项目推进树**（协议缺口传导多个 SDK/客户端、衍生多个跨仓 Issue、需按波次编排 + 收敛）→ 上交 `/advance-plan` 以本节点为根接管级联与收敛，解决后返回本流程收尾。单仓内普通展开不上交。触发边界见单一源：`skills/advance-plan/SKILL.md`「何时上交 advance-plan」。
+
+### 3.4 双 SDK 对称检查（核心三仓强制，协议门控结论为「不涉及协议」时）
+
+按 `skills/issue-radar/resources/core-governance.md` §3：根因/修复属 SDK 共享实现策略（对称 SDK 存在同样结构、同样模式的代码）时：
+
+1. 在对称 SDK 仓库 grep 同名结构/模式（如 `PickString`），命中即存在对称实现
+2. 对称 SDK 有同样问题 → **必须对照提镜像 Issue 到对称项目**（经 `/issue-report` 流程，两 Issue 互相引用）；对称 SDK 无此问题但本侧修复会改变行为语义 → 同样提镜像 Issue 告知对齐
+3. 镜像 Issue 与本次修复挂同 X.Y Milestone（§4）
+
+> **硬性规则**：python-sdk 与 rust-sdk 功能一比一、技术选型同模式，此约定不可打破。禁止单边修复 SDK 共享策略问题而不镜像。
 
 ---
 
@@ -254,6 +278,9 @@ model: opus
 - **禁止无视三仓在推事项** — 核心三仓内动手前必须过 issue-radar 态势门控，🔴 未经用户协调决策不得推进；方案变化必须重扫
 - **禁止补丁式修复** — 不允许特判/绕过/吞异常
 - **禁止绕过协议** — 协议有问题则协议先行
+- **禁止无 Milestone 开工** — 核心三仓 Issue 未挂版本化 Milestone（X.Y 三仓对齐，Z 自由）不得进入 Step 2
+- **禁止未读协议仓就判「SDK 负责」** — 协议归属判定必须过 core-governance §2：协议仓可读性前置 + develop 分支 grep 核对，缺一不可
+- **禁止单边镜像豁免** — 不触协议但属 SDK 共享策略的问题，必须对照提镜像 Issue 到对称项目
 - **禁止跳过体验门控** — 变更触及用户可感交互时，未经用户对体验 before/after 拍板不得动代码（纯内核变更豁免）
 - **禁止无确认实施** — 方案必须经用户审批
 - **禁止重复封装** — 优先复用现有工具

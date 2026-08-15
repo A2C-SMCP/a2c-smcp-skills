@@ -61,3 +61,5 @@ cargo test-agent / test-computer / test-server  # 组件测试
 ## 协议一致性检查
 
 修改 `crates/smcp/` 中类型时，必须对照 a2c-smcp-protocol 规范，并确认 serde 序列化结果与 Python SDK 兼容。关键行为修改时，参考 Python 参考实现确认一致性。
+
+**变更 `crates/smcp/` 类型的字段/形状/语义 = 协议辖区**，不是"SDK 内部"调整 —— 先按 `skills/issue-radar/resources/core-governance.md` §2 做协议归属判定（协议仓 develop 分支 grep 核对），协议辖区须走协议先行（`/add-feature`），并对照 python-sdk 提镜像跟进 Issue（§3）。
