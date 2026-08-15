@@ -34,6 +34,15 @@
 2. 检查是否涉及协议结构变更（`smcp.py` / `model.py`）
 3. 评估对 Server / Computer 模块的影响
 
+## 协议辖区速查（提报/修复前必读）
+
+协议管辖模块：`a2c_smcp/smcp.py`（TypedDict 协议类型）、`a2c_smcp/computer/inputs/`（MCPServerInput 家族，如 `base.py`）、`a2c_smcp/computer/mcp_clients/model.py`（Pydantic）等与协议仓 `docs/specification/` 对应结构同名的定义 —— 其字段形状、语义、序列化格式即 wire format。**变更这些定义 = 协议辖区**，必须先按 `skills/issue-radar/resources/core-governance.md` §2 判定（协议仓可读性前置 + develop 分支 grep 核对），不得当"SDK 内部"提报本仓方案。
+
+```bash
+git -C <path-to>/a2c-smcp-protocol fetch origin develop
+git -C <path-to>/a2c-smcp-protocol grep -n "<结构名>" origin/develop -- docs/
+```
+
 ## 测试信息
 
 - **测试目录**：`tests/`（三层：`unit_tests/`、`integration_tests/`、`e2e/`）

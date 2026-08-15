@@ -44,6 +44,15 @@
 2. 评估 feature flag 影响
 3. 检查公开 API 变更是否需要更新根包 re-export
 
+## 协议辖区速查（提报/修复前必读）
+
+`crates/smcp/` 中的全部类型是**协议管辖** —— 与 a2c-smcp-protocol 仓 `docs/specification/`（如 `data-structures.md`）一一对应，serde 序列化形状即 wire format。**变更这些类型的字段、形状、语义或序列化 = 协议辖区**，必须先按 `skills/issue-radar/resources/core-governance.md` §2 判定（协议仓可读性前置 + develop 分支 grep 核对），不得当"SDK 内部"提报本仓方案。
+
+```bash
+git -C <path-to>/a2c-smcp-protocol fetch origin develop
+git -C <path-to>/a2c-smcp-protocol grep -n "<结构名>" origin/develop -- docs/
+```
+
 ## 测试信息
 
 - **单元测试**：各 crate 内 `#[cfg(test)]`
