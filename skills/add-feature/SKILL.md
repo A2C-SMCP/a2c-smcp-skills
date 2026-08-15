@@ -23,12 +23,15 @@ A2C-SMCP 体系的核心原则：**协议先行，代码跟进**。设计与裁�
 **动作**：
 
 1. 分析用户描述的 Feature，判断是否涉及协议变更
-2. 如涉及多条协议线，按协议线分别走流程
-3. 如不涉及任何协议（纯 MCP 工具等），跳至 Step 6 直接实现
+2. 判定涉及核心三仓时，按 `skills/issue-radar/resources/core-governance.md` §2 执行协议归属判定，两个硬动作不可跳过：
+   - **可读性前置**：本地读不到协议仓 → 停止判定，要求开发者 `git clone git@github.com:A2C-SMCP/a2c-smcp-protocol.git` 并 `/add-dir` 后重试
+   - **develop 核对**：`git grep` 协议仓 develop 分支 `docs/`（最新近况，可接受新需求），本次涉及的结构/事件名命中规范 → 协议辖区，与"看起来像 SDK 内部语义"无关
+3. 如涉及多条协议线，按协议线分别走流程
+4. 如不涉及任何协议（纯 MCP 工具等），跳至 Step 6 直接实现；**当前项目是 python-sdk / rust-sdk 时**，跳转前按 core-governance §3 做双 SDK 对称检查：对称 SDK 存在同样结构/模式 → 是否需同样能力？需要 → 对照建镜像 Issue（挂同 X.Y Milestone）
 
 > **注意**：独立演进的项目（如 ide4ai）在实现与 A2C 协议相关的部分时，仍需遵守已发布的协议规范，不得违反。
 
-使用 AskUserQuestion 与用户确认判定结果。
+使用 AskUserQuestion 与用户确认判定结果（含对称检查结论）。
 
 ---
 
@@ -53,6 +56,8 @@ A2C-SMCP 体系的核心原则：**协议先行，代码跟进**。设计与裁�
 | **大型** | 跨多仓库/多协议线、预估多轮迭代 | 创建 Milestone → 拆分多个 Issue → 统一 Label |
 | **中型** | 单仓库内、有明确边界 | 创建 Issue（可含 checklist 子任务）→ 归入现有或新建 Milestone |
 | **小型** | 单文件级、改动收敛 | 至少创建 1 个 Issue 记录 |
+
+**Milestone 版本治理（核心三仓强制）**：python-sdk / rust-sdk / a2c-smcp-protocol 的 Feature 不论规模，一律必须归入**版本化 Milestone**（`skills/issue-radar/resources/core-governance.md` §4）——同一功能线在三仓的 Milestone 同 X.Y，Z 按各仓 patch 节奏自由；Milestone 命名与仓库发版版本同形（如 `v0.3.1`）。无合适 Milestone → 创建后再落 Issue，命令见 core-governance §4.4。
 
 ### 1.2 已有 Issue 审视
 
@@ -190,7 +195,8 @@ A2C-SMCP 体系的核心原则：**协议先行，代码跟进**。设计与裁�
 
 1. 根据 Step 0 判定的协议线，列出需要跟进的代码仓库
 2. 确认各仓库的实现优先级和依赖关系
-3. 按 Step 1 治理方案，在各代码仓库创建对应 Issue，归入 Milestone 并标记 Label，引用协议 PR/版本号
+3. 按 Step 1 治理方案，在各代码仓库创建对应 Issue，引用协议 PR/版本号
+4. **Milestone 对齐（核心三仓强制）**：各仓跟进 Issue 必须归入**与协议仓同 X.Y 的版本化 Milestone**（core-governance §4；Z 自由）。协议先行问题的动工条件：协议侧合入 develop 并 push 后代码侧即可动工，不需等 main 发布（main 发布是 4b 发版门）
 
 **依赖关系原则**：
 - SDK 仓库（python-sdk, rust-sdk）通常先实现
@@ -261,3 +267,6 @@ Feature 需求 → Step 0 判定协议归属 → Step 0.5 三仓态势门控 ◄
 | 协议草案直接合并不验证消费方实现可行性 | 任何新事件/字段/错误码必须经至少一轮 cross-ask 双向验证，P0 反馈全部消化后再进入 Step 4 |
 | 消费方反馈"做不到"就直接砍协议字段 | 先级联问其他消费方（OASP：Add-In→Server）；只有所有消费方都不能时才砍 |
 | 实现完直接自评满意就收尾 | 经隔离上下文 code-reviewer 子代理客观复审，🔴 清零才算完成（琐碎改动可豁免） |
+| 把协议规范中定义的结构当"SDK 负责"单仓变更 | 先过 core-governance §2：develop 分支 grep 命中规范 = 协议辖区，必须协议先行 + 双 SDK 对称跟进 |
+| 任务未挂版本化 Milestone 就开工 | 核心三仓所有任务必须归入版本化 Milestone（X.Y 三仓严格对齐，Z 自由） |
+| 单 SDK 推进不检查对称项目 | SDK 共享策略问题/需求必须对照提镜像 Issue 到对称 SDK，互引并挂同 X.Y Milestone |
