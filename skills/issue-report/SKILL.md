@@ -29,6 +29,8 @@ argument-hint: "<问题描述或需求概述>"
 | **Feature Request** | 新功能、新增、支持 XXX、希望能 | `enhancement` |
 | **Improvement** | 优化、改进、重构、性能、体验提升 | `improvement` |
 
+**核心三仓 Bug 判定必须先过 `skills/issue-radar/resources/core-governance.md` §1**：正确性无疑义 + 协议与 Python/Rust SDK 已共识 + 单纯单一 SDK 实现问题，三条同时满足才算 Bug。涉及共享数据结构/事件/字段**形状或语义变更**的"改进"是协议变更，不是 Improvement——判定优先级：先 §2 协议归属，再定类型。
+
 如果类型不明确，使用 AskUserQuestion 确认。
 
 ---
@@ -64,7 +66,22 @@ argument-hint: "<问题描述或需求概述>"
 
 ---
 
-## Step 2.5：三仓态势扫描门控（SMCP 核心三仓强制）
+## Step 2.5：协议归属门控（SMCP 核心三仓强制）
+
+当前项目属于核心三仓（a2c-smcp-protocol / python-sdk / rust-sdk）时，生成 Issue 内容前**必须**按 `skills/issue-radar/resources/core-governance.md` §2 判定「协议该管的，还是 SDK 自己的实现选择」：
+
+1. **可读性前置**：本地读不到协议仓 → 停止判定，要求开发者 `git clone git@github.com:A2C-SMCP/a2c-smcp-protocol.git` 并 `/add-dir` 后重试
+2. **develop 核对**：`git grep` 协议仓 develop 分支 `docs/`，结构/事件名命中规范 → 协议辖区
+3. **结果分支**：
+   - **协议辖区** → **停止在本仓生成补救方案**。改向协议仓提报（`/issue-report` 在协议仓执行，或转 `/add-feature` 协议先行）；本仓确需 Issue 时挂 follow-up 并引用协议 Issue
+   - **SDK 自治区** → 继续，并按 §3 做双 SDK 对称检查（结果带进 Step 6）
+   - 协议模糊/未覆盖 → AskUserQuestion 确认
+
+> 判定路径与信号表见 core-governance §2，判定结论须在 Step 4 用户确认时一并展示。
+
+---
+
+## Step 2.6：三仓态势扫描门控（SMCP 核心三仓强制）
 
 当前项目属于核心三仓（a2c-smcp-protocol / python-sdk / rust-sdk）时，生成 Issue 前**必须**按 `skills/issue-radar/SKILL.md` 扫描三仓（此时 Step 2 已收集上下文，扫描关键词最准）：
 
@@ -210,29 +227,38 @@ argument-hint: "<问题描述或需求概述>"
 
 从当前项目的 resource 文件中获取 GitHub `owner/repo`（已内联，无需命令查询）。
 
-### 5.2 提交
+### 5.2 Milestone 门控（SMCP 核心三仓强制）
+
+当前项目属于核心三仓时，Issue **必须挂版本化 Milestone**（`skills/issue-radar/resources/core-governance.md` §4）：
+
+1. 列现有 Milestone：`gh api repos/<owner>/<repo>/milestones --jq '.[].title'`
+2. 有同功能线 X.Y 的 Milestone → 直接挂载；无 → AskUserQuestion 确认创建 `vX.Y.Z`（X.Y 与协议仓及对称 SDK 对齐，Z 自由）
+3. 把确认结果写入正文「Milestone」说明，并在 Step 4 用户确认时展示
+
+### 5.3 提交
 
 ```bash
 gh issue create \
   --repo <owner/repo> \
   --title "<Issue 标题>" \
   --label "<label1>,<label2>" \
+  --milestone "<vX.Y.Z>" \
   --body "$(cat <<'EOF'
 <Issue 正文内容>
 EOF
 )"
 ```
 
-### 5.3 确认结果
+### 5.4 确认结果
 
 - 输出创建的 Issue URL
 - 如果创建失败（如 label 不存在），自动去掉不存在的 label 重试
 
 ---
 
-## Step 6：跨项目联动（如适用）
+## Step 6：跨项目联动
 
-当 Issue 涉及跨仓库影响时：
+**SMCP 核心三仓按 `skills/issue-radar/resources/core-governance.md` §3 镜像规则强制**（对称 SDK 存在同样结构/模式的问题或需求，必须对照提镜像 Issue 到对称项目，两 Issue 互相引用）；其余项目按场景表判定：
 
 | 场景 | 动作 |
 |------|------|
@@ -240,7 +266,7 @@ EOF
 | Feature 需要协议变更 | 先向协议仓库提 Issue/RFC，在本项目 Issue 中引用 |
 | 影响配对项目（如 office4ai ↔ office-editor4ai） | 在关联项目创建对应 Issue，互相引用 |
 
-使用 AskUserQuestion 确认是否需要跨项目联动，确认后才创建关联 Issue。
+使用 AskUserQuestion 确认联动方案（核心三仓的镜像 Issue 仅确认镜像内容，不可豁免），确认后才创建关联 Issue。
 
 ---
 
@@ -248,6 +274,9 @@ EOF
 
 - **禁止未确认提交** — Issue 内容必须经用户审阅
 - **禁止重复提报** — 核心三仓提报前必须过 issue-radar 态势门控；已有人推进的主题不另开 Issue，冲突的先由用户协调对齐
+- **禁止未判协议归属就提补救方案** — 核心三仓必须先过 Step 2.5 协议归属门控（读协议仓 develop 核对）；协议辖区的问题不得在本仓提报补救方案
+- **禁止无 Milestone 提报** — 核心三仓 Issue 必须挂版本化 Milestone（X.Y 与协议仓及对称 SDK 对齐，Z 自由）
+- **禁止单边镜像豁免** — 双 SDK 共享策略问题必须对照提镜像 Issue，镜像不可跳过
 - **禁止空洞描述** — 每个 Issue 必须有具体的上下文和可操作的信息
 - **禁止跳过上下文收集** — 自动收集步骤不可省略，这是 Issue 质量的保障
 - **GitHub URL 内联** — 仓库地址从 resource 文件读取，不通过命令查询

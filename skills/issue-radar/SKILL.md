@@ -18,13 +18,15 @@ argument-hint: "<主题/问题简述>"
 | python-sdk | A2C-SMCP/python-sdk | SMCP 参考实现 |
 | rust-sdk | A2C-SMCP/rust-sdk | SMCP 生产实现 |
 
+> **三仓治理规则**（Bug 判定准则 / 协议归属判定 / 双 SDK 镜像规则 / Milestone 版本治理）见单一源：`skills/issue-radar/resources/core-governance.md`。本 skill 负责态势侦察，治理动作按该文档由上游 skill 执行。
+
 ## 触发场景
 
 | 场景 | 拉起方 |
 |------|--------|
 | 修复问题、根因分析前 | `fix-issue` Step 1.3 门控 |
 | 新增 Feature、建追踪结构前 | `add-feature` Step 0.5 门控 |
-| 提报 Issue 前 | `issue-report` Step 2.5 门控 |
+| 提报 Issue 前 | `issue-report` Step 2.6 门控 |
 | 开发中 / 方案制定中**方案发生变化** | 任意流程重入本 skill |
 | 发起三仓问询前摸底（建议） | `cross-ask` |
 | 用户主动了解三仓态势 | 直接调用 |
