@@ -3,3 +3,4 @@
 test:
 	@echo "Running tests..."
 	@bash tests/test_smcp_env.sh
+	@python3 -m unittest discover -s tests -p 'test_*.py'
