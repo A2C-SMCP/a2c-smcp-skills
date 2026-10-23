@@ -34,7 +34,7 @@ git -C "<协议仓>" fetch -q origin develop && git -C "<协议仓>" rev-parse -
 
 | 角色 | 采集 |
 |------|------|
-| sdk-developer | 本任务相关的向量 / 一致性测试：当场运行，记通过数 / 总数与失败原因 |
+| sdk-developer | 本任务相关的向量 / 一致性测试：当场运行，记通过数 / 总数与失败原因；架构师缺位且代行契约通道时，另按 sdk-architect 口径采集全仓状态，写入「对齐状态（代行）」 |
 | sdk-architect | 本仓对 `contract_version` 的向量副本状态（SAME / STALE / MISSING / 本仓独有）、场景向量映射缺口、一致性测试通过数 / 总数、在推镜像 Issue 与对方状态 |
 | protocol-owner | 各 SDK 最近一次 `对齐回报` 的内容与时间（不代为运行 SDK 测试）；待裁决问询、未回复的通告 |
 

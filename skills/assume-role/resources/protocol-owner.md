@@ -54,7 +54,7 @@
 
 ## 契约变更通告
 
-协议变更合入 develop 并 push 后（开工门打开），向两个 SDK 的架构师发 `契约变更通告`（team.md §2）：
+协议变更合入 develop 并 push 后（开工门打开），向两个 SDK 的架构师发 `契约变更通告`（team.md §2）；某 SDK 没有在线架构师时按 team.md §9 降级发给该仓开发会话：
 
 ```text
 [契约变更通告 protocol#<N>] <本会话名>（protocol-owner@a2c-smcp-protocol）：<vX.Y> <变更一句话>

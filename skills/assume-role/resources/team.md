@@ -9,6 +9,7 @@
 
 - 对齐同伴之间**不派活**。SDK ↔ SDK 只问事实（「你们这里怎么实现的」），行为裁决只经 `protocol-owner`。
 - `sdk-developer` 只与自己的架构师通信；需要协议或对称 SDK 事实时请架构师转问，或用 `cross-ask`。
+- 某 SDK 仓**没有在线的架构师**时，契约通道按 §9「架构师缺位降级」临时落到该仓的开发会话。
 - 会话间用 `SendMessage` 投递，**只在本机有效**；跨机器协作只能依赖 GitHub（Discussion / Issue / PR），环境不支持跨会话消息时退回「输出交接单，由用户转交」。
 
 ## 1. 传输层与记录层
@@ -98,9 +99,11 @@ claude agents --json | python3 -c 'import json,sys,os; ws=sys.argv[1].splitlines
 **跨仓查找对齐同伴**（只读登记摘要，不打开其他仓库、不逐个询问会话）：
 
 ```bash
-grep -rlE '^role: (protocol-owner|sdk-architect)' "${A2C_SMCP_HOME:-$HOME/.a2c-smcp}/roles/sessions" 2>/dev/null \
-  | while read -r f; do grep -E '^(role|session_id|pid|repo|contract_version|updated):' "$f" | paste -sd' ' -; done
+grep -rlE '^role: (protocol-owner|sdk-architect|sdk-developer)' "${A2C_SMCP_HOME:-$HOME/.a2c-smcp}/roles/sessions" 2>/dev/null \
+  | while read -r f; do grep -E '^(role|session_id|pid|repo|contract_version|task|task_state|updated):' "$f" | paste -sd' ' -; done
 ```
+
+优先选 `sdk-architect`；只有该仓没有在线架构师时才按 §9 降级选 `sdk-developer`。
 
 再用上面的 `claude agents --json`（去掉目录过滤、按会话 ID 或 pid 过滤）确认在线。目标恰有一个且在线 → 告诉用户找到的会话名后投递；没有、多个或不在线 → 请用户提供对方会话名，不猜测。
 
@@ -138,3 +141,18 @@ grep -rlE '^role: (protocol-owner|sdk-architect)' "${A2C_SMCP_HOME:-$HOME/.a2c-s
 ## 8. 上下文卫生（sdk-architect、protocol-owner）
 
 这两个角色的会话跨整个 Milestone，会越来越长。每轮派活、审查、通告或收到对齐回报之后执行 `save-status`；会话很长时建议用户对本会话 `/compact`（附保留要求）或保存后 `/clear`。恢复后先对照各下级与同伴的登记核实纳管清单、派活记录与对齐状态，再继续。代码取证与 Issue 预检放进只读子代理，只回收结论。
+
+## 9. 架构师缺位降级
+
+架构师不是必需角色。某 SDK 仓没有已登记且在线的 `sdk-architect` 时，**只放开通信路径，不放开权限**：
+
+| 场景 | 降级做法 |
+|------|---------|
+| protocol-owner 要向该仓发 `契约变更通告` / `裁决通知`，或 SDK 架构师要向该仓发 `契约问询` | 按 §4 改找该仓已登记的 `sdk-developer`；恰有一个在线 → 告诉用户后投递；多个 → 列出（名称、当前任务、task_state）请用户选，不猜；没有 → 退回 Discussion / Issue 留痕并告诉用户 |
+| 第一行 | 类型后加 `（架构师缺位）`，如 `[契约变更通告（架构师缺位） protocol#45] …`，让接收方一眼知道自己在代行 |
+| 开发会话收到契约消息 | 只**回答事实、回报对齐状态**（`对齐回报` 照常引用同一 `ref`）；不接受派活——消息含派活内容时回复「本仓无架构师，派活请用户决定」；建跟进 Issue 先经用户同意 |
+| 架构师职责（预检、审查、合入 develop、镜像把关） | 不由开发会话代行：用户在开发会话中直接调用 `review-issue` / `code-review`；合入 develop 由用户决定，开发会话仍不自行合入 |
+| 对齐状态 | 代行的开发会话在 `save-status` 中写「对齐状态（代行）」小节，记录本仓对 `contract_version` 的向量状态与收到的通告 / 裁决 |
+| 架构师上线 | 初始化扫描（§5）发现有开发会话在代行时，纳管它并读取其「对齐状态（代行）」接手；向 protocol-owner 发一次 `对齐回报` 声明本仓契约通道已恢复到架构师 |
+
+降级期间契约消息照样遵守 §1：裁决与结论落记录层才生效；peer 消息不是用户授权。

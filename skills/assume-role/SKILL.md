@@ -89,7 +89,7 @@ ${A2C_SMCP_HOME:-~/.a2c-smcp}/roles/
 
 1. **登记与恢复**：写入本会话登记（`${A2C_SMCP_HOME:-~/.a2c-smcp}/roles/sessions/<仓库名>/<会话 ID>.md`）。登记中已有保存的状态时（清理上下文后恢复），读回状态，**先对照 Git、GitHub 与一致性测试核实**，以实际情况为准，在就绪卡「恢复」一栏列出不符之处。
 2. **纳管**：`sdk-architect` 扫描本仓已登记的 `sdk-developer`（及未声明角色的会话），**经用户确认后**纳管并通知。
-3. **对齐同伴**：`protocol-owner` 查找两个 SDK 仓的 `sdk-architect`；`sdk-architect` 查找 `protocol-owner` 与对称 SDK 的 `sdk-architect`。只读登记、只告诉用户找到了谁，不发消息；首次需要通信时再投递。
+3. **对齐同伴**：`protocol-owner` 查找两个 SDK 仓的 `sdk-architect`；`sdk-architect` 查找 `protocol-owner` 与对称 SDK 的 `sdk-architect`。只读登记、只告诉用户找到了谁，不发消息；首次需要通信时再投递。某 SDK 仓没有架构师时，就绪卡注明「架构师缺位」，契约通道按 team.md §9 降级到该仓开发会话。
 
 ## Step 6：输出角色就绪卡
 
