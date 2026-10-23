@@ -11,6 +11,8 @@ A2C-SMCP 开源项目的 Claude Code Plugin Marketplace。用户通过 `claude p
 - `.claude-plugin/marketplace.json` — Marketplace 注册中心，定义单一插件 `a2c-smcp-toolkit`
 - `.claude/skills/` — 本项目的开发工具 Skill（如 `create-skill`），不分发
 - `skills/` — 分发给各项目的 Skill，每个子目录含 `SKILL.md`，通过 Claude Code 自动发现机制加载
+- `agents/` — 分发的隔离子代理（`code-reviewer` / `issue-reviewer`），预加载对应 Skill
+- `hooks/hooks.json` + `scripts/` — 插件 hook：SessionStart（clear/compact/resume）按 `~/.a2c-smcp/roles/sessions/` 登记恢复 `assume-role` 角色；测试见 `tests/test_restore_role_state.py`（`make test`）
 
 ## Skill 开发规范
 

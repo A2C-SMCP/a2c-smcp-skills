@@ -145,6 +145,28 @@ gh issue edit <N> -R A2C-SMCP/<repo> --milestone "vX.Y.Z"
 | §2 协议归属判定 | Step 2.5 门控 | Step 3.1 判定 | Step 0 归属判定 | — |
 | §3 双 SDK 镜像 | Step 6 跨项目联动 | Step 3.4 对称检查 | Step 0 无协议分支 / Step 5 | — |
 | §4 Milestone 治理 | Step 5 提交前 | Step 1.4 开工门控 | Step 1.1 / Step 5 | Step 1 前置检查（X.Y 对齐） |
+| §6 一致性向量 | — | — | （待接入） | （待接入） |
+
+> §6 目前由 `assume-role` 角色卡（protocol-owner 发版前对齐门、sdk-architect 合入前核对）执行；接入 `add-feature` / `release` 的具体步骤待后续 PR。
+
+---
+
+## §6 一致性向量（对齐判据）
+
+**一致性向量是三仓对齐的客观判据。** 协议仓 `docs/specification/fixtures/*_conformance_vectors.json` 是向量的唯一源，按性质分两类：
+
+| 类别 | 判别 | SDK 对拍方式 | 例 |
+|------|------|-------------|----|
+| **数据向量** | 纯输入→输出（算法、命名、序列化） | vendored **逐字节副本**并逐条对拍（位置见 `skills/assume-role/resources/sdk/<仓库>.md`） | `bundle_id`、`env_segment` |
+| **场景向量** | 需真实传输 / 真实 server 构造的行为景 | 不强制 vendored；每一景须有测试用例**逐景映射**（测试注释引用向量 `desc`），断言 expected 全部字段 | `auth_error` |
+
+| 规则 | 要求 |
+|------|------|
+| 行为变化带向量 | 协议变更改变了可观察行为时，同一 PR 新增或修改向量；写不出向量说明规范不够精确。不带向量须在 PR 中写明理由 |
+| 数据向量副本一致 | SDK 副本与协议 develop 不一致（STALE）即为未对齐，跟进 Issue 中同步 |
+| 双端全覆盖 | 协议有的向量两 SDK 都须覆盖（数据向量缺副本 = MISSING；场景向量缺映射用例 = 未覆盖）；标注 N/A 的景须在向量文件中声明 |
+| SDK 独有向量 | 两 SDK 共有、协议没有的向量是未上收的共享约定，按 §2 判定是否属协议辖区，属则上收协议仓 |
+| 发版门 | 协议发布 X.Y 前，两 SDK 对该 X.Y 的向量全部通过，或有用户认可的豁免 |
 
 ---
 
