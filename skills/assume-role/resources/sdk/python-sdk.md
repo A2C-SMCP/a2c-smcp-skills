@@ -3,7 +3,7 @@
 | 项 | 值 |
 |----|----|
 | GitHub | `A2C-SMCP/python-sdk` |
-| 分支 | 集成分支 `develop`，发布分支 `main` |
+| 分支 | 集成分支 `develop`（PR 投这里），发布分支 `main` |
 | 协议版本声明 | `a2c_smcp/__init__.py` 的 `PROTOCOL_VERSION`（X.Y 须与 `contract_version` 一致，`release` Step 1 校验） |
 | 对称 SDK | rust-sdk（见 [rust-sdk.md](rust-sdk.md)） |
 

@@ -3,7 +3,7 @@
 | 项 | 值 |
 |----|----|
 | GitHub | `A2C-SMCP/rust-sdk` |
-| 分支 | 集成分支 `develop`，发布分支 `main` |
+| 分支 | 集成分支 = **当前 X.Y 版本线分支 `dev-X.Y.Z`**（如 `dev-0.5.0`，PR 投这里）；无版本线分支时为 `develop`；发布分支 `main`。确认：`git ls-remote --heads origin 'dev-*'` |
 | 协议版本声明 | `crates/smcp/src/lib.rs` 的 `PROTOCOL_VERSION`（X.Y 须与 `contract_version` 一致，`release` Step 1 校验） |
 | Workspace | `crates/{smcp, smcp-agent, smcp-computer, smcp-client-transport, smcp-server-core, smcp-server-hyper}` |
 | 对称 SDK | python-sdk（见 [python-sdk.md](python-sdk.md)） |

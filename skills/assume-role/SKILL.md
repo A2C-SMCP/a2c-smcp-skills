@@ -27,7 +27,7 @@ argument-hint: "<protocol-owner|协议负责人|sdk-architect|SDK架构师|sdk-d
 ## Step 1：确定上下文
 
 1. **本仓库**：`git remote get-url origin` 取仓库名（`a2c-smcp-protocol` / `python-sdk` / `rust-sdk`）。不用目录名——本地目录名因人而异，worktree 目录名更会漂移。非核心三仓时告诉用户本 Skill 当前只覆盖核心三仓，不初始化。
-2. **SDK 差异**：SDK 角色读取 `resources/sdk/<仓库名>.md`（目录、测试命令、一致性测试位置、协议版本声明位置）。
+2. **SDK 差异**：SDK 角色读取 `resources/sdk/<仓库名>.md`（集成分支、目录、测试命令、一致性测试位置、协议版本声明位置）。角色卡与团队协议中的「develop」均指该文件定义的**本仓集成分支**（如 rust-sdk 的版本线分支 `dev-0.5.0`）；交接单的「合入目标」写实际分支名。
 3. **任务锚**：参数带了 Issue#ID 或任务描述就记下，Step 6 后直接进入；没有则就绪后等待派活。
 
 ## Step 2：加载契约锚
